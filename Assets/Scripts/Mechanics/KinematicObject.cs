@@ -78,7 +78,7 @@ namespace Platformer.Mechanics
 
         protected virtual void OnDisable()
         {
-            body.isKinematic = false;
+            //body.isKinematic = false;
         }
 
         protected virtual void Start()

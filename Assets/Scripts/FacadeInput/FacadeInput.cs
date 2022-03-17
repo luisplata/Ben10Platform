@@ -7,8 +7,10 @@ using UnityEngine.InputSystem.Controls;
 
 public class FacadeInput : MonoBehaviour
 {
+    public delegate void OnTransformation();
+    public OnTransformation OnTransform;
     [SerializeField] private Joystick _joystick;
-    [SerializeField] private FunctionFromAnimator _fromAnimator;
+    private FunctionFromAnimator _fromAnimator;
     private bool pressJumpButton;
     private float velocity;
     private bool fire;
@@ -45,8 +47,7 @@ public class FacadeInput : MonoBehaviour
     
     public void Transform()
     {
-        
-        Jump();
+        OnTransform?.Invoke();
     }
     
     public void Fire()
@@ -86,8 +87,9 @@ public class FacadeInput : MonoBehaviour
         pressJumpButton = true;
     }
 
-    public void Configure()
+    public void Configure(Pj getAnimator)
     {
+        _fromAnimator = getAnimator.GetComponent<FunctionFromAnimator>();
         _fromAnimator.Configure();
         _fromAnimator.finishAnimatorPunch += FinishPunch;
     }
@@ -100,5 +102,12 @@ public class FacadeInput : MonoBehaviour
     public void FinishPunch()
     {
         fire = false;
+    }
+
+    public void DestroyPj(Pj pj)
+    {
+        if (pj == null) return;
+        OnDestroy();
+        Destroy(pj.gameObject);
     }
 }

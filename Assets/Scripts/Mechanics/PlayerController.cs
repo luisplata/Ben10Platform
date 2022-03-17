@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks.Triggers;
+using Factory;
 using UnityEngine;
 using Platformer.Gameplay;
 using static Platformer.Core.Simulation;
@@ -15,8 +17,12 @@ namespace Platformer.Mechanics
     public class PlayerController : KinematicObject
     {
         [SerializeField] private FacadeInput inputCustom;
-        [SerializeField] private Animator animator;
-        [SerializeField] private SpriteRenderer spriteRenderer;
+        [SerializeField] private GameObject pointToReference;
+        private Animator animator;
+        private SpriteRenderer spriteRenderer;
+        [SerializeField] private PjFactory _pjFactory;
+        [SerializeField] private string nameOfFirstPj;
+        private Pj pj;
         public AudioClip jumpAudio;
         public AudioClip respawnAudio;
         public AudioClip ouchAudio;
@@ -48,8 +54,32 @@ namespace Platformer.Mechanics
             health = GetComponent<Health>();
             audioSource = GetComponent<AudioSource>();
             collider2d = GetComponent<Collider2D>();
-            inputCustom.Configure();
             controlEnabled = true;
+            _pjFactory.Configure();
+            CreatePj(nameOfFirstPj);
+        }
+
+        private void ConfigurePj()
+        {
+            inputCustom.Configure(pj);
+            pj.transform.SetParent(transform);
+            animator = pj.GetAnimator();
+            spriteRenderer = pj.GetComponent<SpriteRenderer>();
+            inputCustom.OnTransform += OnTransform;
+            pj.transform.localPosition = pointToReference.transform.localPosition;
+        }
+
+        private void OnTransform()
+        {
+            //Here get a random name of alien and constructing
+            CreatePj("perro");
+        }
+
+        private void CreatePj(string nameOfPj)
+        {
+            inputCustom.DestroyPj(pj);
+            pj = _pjFactory.SpawnPj(nameOfPj);
+            ConfigurePj();
         }
 
         protected override void Update()
