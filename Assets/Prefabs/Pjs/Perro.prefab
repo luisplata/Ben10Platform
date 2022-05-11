@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7905286103516235053}
   - component: {fileID: 7905286103516235052}
   - component: {fileID: 7905286103516235055}
-  - component: {fileID: -3328708897603625296}
+  - component: {fileID: -7131193759465724128}
   m_Layer: 13
   m_Name: Perro
   m_TagString: Untagged
@@ -28,7 +28,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7905286103516235051}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.098, y: 0.083, z: 0}
+  m_LocalPosition: {x: -0.098, y: -0.067, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -73,7 +73,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 10
   m_Sprite: {fileID: -5967377402979067273, guid: 42a718d79f4e92f4d86f47083fef0273,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -117,7 +117,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50a143cb4dbc8d845893e3ba4a24aa96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &-3328708897603625296
+--- !u!114 &-7131193759465724128
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -126,9 +126,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 7905286103516235051}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 40feba36b35741f6a6851c4bf90d594c, type: 3}
+  m_Script: {fileID: 11500000, guid: c85153493fb24435a941057c68e5cf92, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   id: perro
   _controller: {fileID: 9100000, guid: 7e2b559b0bc56fe448d3e01ee16b48b1, type: 2}
   _animator: {fileID: 7905286103516235052}
+  _smoothTime: 0.04

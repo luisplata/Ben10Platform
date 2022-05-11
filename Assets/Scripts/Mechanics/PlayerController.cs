@@ -1,12 +1,17 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks.Triggers;
 using Factory;
+using Mechanics;
 using UnityEngine;
 using Platformer.Gameplay;
 using static Platformer.Core.Simulation;
 using Platformer.Model;
 using Platformer.Core;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 namespace Platformer.Mechanics
 {
@@ -14,7 +19,7 @@ namespace Platformer.Mechanics
     /// This is the main class used to implement control of the player.
     /// It is a superset of the AnimationController class, but is inlined to allow for any kind of customisation.
     /// </summary>
-    public class PlayerController : KinematicObject
+    public class PlayerController : KinematicObject, IPlayerController
     {
         [SerializeField] private FacadeInput inputCustom;
         [SerializeField] private GameObject pointToReference;
@@ -22,10 +27,15 @@ namespace Platformer.Mechanics
         private SpriteRenderer spriteRenderer;
         [SerializeField] private PjFactory _pjFactory;
         [SerializeField] private string nameOfFirstPj;
+        [SerializeField] private List<string> listOfAliens;
+        [SerializeField] private float timeToWaitAfterReturnToBen;
+        [SerializeField] private Image imageToTransformInAlien; 
         private Pj pj;
         public AudioClip jumpAudio;
         public AudioClip respawnAudio;
         public AudioClip ouchAudio;
+        private bool countRevertTimeTOReturnToBen;
+        private float timeToTransformInAlien;
 
         /// <summary>
         /// Max horizontal speed of the player.
@@ -41,7 +51,7 @@ namespace Platformer.Mechanics
         /*internal new*/ public Collider2D collider2d;
         /*internal new*/ public AudioSource audioSource;
         public Health health;
-        public bool controlEnabled = true;
+        public bool controlEnabled;
 
         bool jump;
         Vector2 move;
@@ -67,16 +77,20 @@ namespace Platformer.Mechanics
             spriteRenderer = pj.GetComponent<SpriteRenderer>();
             inputCustom.OnTransform += OnTransform;
             pj.transform.localPosition = pointToReference.transform.localPosition;
+            pj.ConfigurePj(this);
         }
 
         private void OnTransform()
         {
             //Here get a random name of alien and constructing
-            CreatePj("perro");
+            var random = Random.Range(0, listOfAliens.Count);
+            CreatePj(listOfAliens[random]);
+            countRevertTimeTOReturnToBen = true;
         }
 
         private void CreatePj(string nameOfPj)
         {
+            inputCustom.OnTransform -= OnTransform;
             inputCustom.DestroyPj(pj);
             pj = _pjFactory.SpawnPj(nameOfPj);
             ConfigurePj();
@@ -99,8 +113,21 @@ namespace Platformer.Mechanics
             {
                 move.x = 0;
             }
+            if(countRevertTimeTOReturnToBen)timeToTransformInAlien += Time.deltaTime;
+            if (timeToTransformInAlien > timeToWaitAfterReturnToBen)
+            {
+                timeToTransformInAlien = 0;
+                CreatePj(nameOfFirstPj);
+                countRevertTimeTOReturnToBen = false;
+            }
+            UpdatingImageToCanTranform();
             UpdateJumpState();
             base.Update();
+        }
+
+        private void UpdatingImageToCanTranform()
+        {
+            imageToTransformInAlien.fillAmount = inputCustom.GetPorcentToTransformInAlien();
         }
 
         void UpdateJumpState()
@@ -158,6 +185,7 @@ namespace Platformer.Mechanics
                         if (inputCustom.IsAction())
                         {
                             move.x = 0;
+                            pj.Action();
                         }
                     }
                     break;
@@ -184,6 +212,8 @@ namespace Platformer.Mechanics
                 spriteRenderer.flipX = false;
             else if (move.x < -0.01f)
                 spriteRenderer.flipX = true;
+            
+            Debug.Log($"{move.x} {spriteRenderer.flipX} {spriteRenderer.gameObject.name}");
 
             animator.SetBool("grounded", IsGrounded);
             animator.SetFloat("velocityX", Mathf.Abs(velocity.x) / maxSpeed);
@@ -194,7 +224,7 @@ namespace Platformer.Mechanics
             else
             {
                 targetVelocity = move * maxSpeed;   
-            }
+            }  
         }
 
         public enum JumpState
@@ -209,6 +239,29 @@ namespace Platformer.Mechanics
         public void PlayerWin()
         {
             animator.SetTrigger("victory");
+            controlEnabled = false;
+            StartCoroutine(ReturnToStart());
+            
+        }
+
+        private IEnumerator ReturnToStart()
+        {
+            yield return new WaitForSeconds(2f);
+            SceneManager.LoadScene(1);
+        }
+
+        public void MoveForward(float smoothFactor)
+        {
+            Debug.Log($"spriteRenderer.flipX {spriteRenderer.flipX}");
+            transform.position = Vector2.Lerp(transform.position, transform.position + (spriteRenderer.flipX ? Vector3.left : Vector3.right), smoothFactor);
+        }
+
+        private void OnTriggerEnter2D(Collider2D col)
+        {
+            if (col.CompareTag("Finish"))
+            {
+                PlayerWin();
+            }
         }
     }
 }

@@ -1276,7 +1276,7 @@ TextureImporter:
     second: beastRun5
   - first:
       213: -3252947155914387325
-    second: spritesheetBen10_424
+    second: winBeast
   - first:
       213: -5428549081750233484
     second: beastRunAtack1
@@ -10504,7 +10504,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: spritesheetBen10_424
+      name: winBeast
       rect:
         serializedVersion: 2
         x: 617

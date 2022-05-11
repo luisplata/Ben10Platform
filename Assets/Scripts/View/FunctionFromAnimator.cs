@@ -9,10 +9,12 @@ public class FunctionFromAnimator : MonoBehaviour
     public OnActionEver finishAnimatorPunch;
     public void Configure()
     {
+        Debug.Log($"Configure {name}");
     }
 
     public void FinishAnimatorPunch()
     {
+        Debug.Log($"Finish punch animation {name}");
         finishAnimatorPunch?.Invoke();
     }
 }
